@@ -1,0 +1,4 @@
+interface:
+  display_name: "uni-app 静态页面"
+  short_description: "创建适配 uni-app 的高完成度静态页面。"
+  default_prompt: "Use $frontend-static-page 根据我的内容和风格要求生成一个适配 uni-app 的高完成度静态页面。"

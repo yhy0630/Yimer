@@ -1,0 +1,4 @@
+interface:
+  display_name: "uni-app 静态页"
+  short_description: "按 uni-app 与 uView 约定生成高完成度静态页面"
+  default_prompt: "Use $uni-app-static-page 根据我的文案、截图或原型生成一个贴合当前项目的 uni-app 静态页面。"

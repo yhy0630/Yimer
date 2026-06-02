@@ -1,0 +1,270 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		// {
+		// 	"path": "pages/guide/guide",
+		// 	"style": {
+		// 		"navigationStyle": "custom",
+		// 		"disableScroll": true
+		// 	}
+		// },
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "登录",
+				"enablePullDownRefresh": false,
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/user/user",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/surprise/surprise",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/service/service",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom",
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/friend/friend",
+			"style": {
+				"navigationBarTitleText": "",
+				"navigationStyle": "custom"
+			}
+		}
+	],
+	"subPackages": [{
+		"root": "bundle",
+		"pages": [
+			{
+				"path": "pages/message_center/message_center",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/intelligent_guide/intelligent_guide",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/sign_center/sign_center",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/sign_document/sign_document",
+				"style": {
+					"navigationStyle": "custom",
+					"componentPlaceholder": {
+						"u-parse": "view"
+					}
+				}
+			},
+			{
+				"path": "pages/sign_signature/sign_signature",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/sign_result/sign_result",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/campus/campus",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/campus/detail",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/city/city"
+			},
+			{
+				"path": "pages/doctor/detail",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/server_explan/server_explan",
+				"style": {
+					"navigationStyle": "custom",
+					"componentPlaceholder": {
+						"u-navbar": "view",
+						"u-parse": "view"
+					}
+				}
+			},
+			{
+				"path": "pages/publish/editor",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/publish/topic",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/topic/detail",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/treasure_shop/detail",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/treasure_shop/feature",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/publish/friend",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/moment/detail",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/moment/report",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/publish/community",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/publish/treasure_shop",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			}
+		]
+	},
+	{
+		"root": "bundle_surprise",
+		"pages": [
+			{
+				"path": "pages/activity_more/activity_more",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/goods_detail/goods_detail",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			}
+		]
+	},
+	{
+		"root": "bundle_service",
+		"pages": [
+			{
+				"path": "pages/appointment_register/appointment_register",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			}
+		]
+	}],
+	"tabBar": {
+		"color": "#242424",
+		"selectedColor": "#143080",
+		"borderStyle": "black",
+		"list": [{
+				"pagePath": "pages/index/index",
+				"iconPath": "/static/tabbar/home.png",
+				"selectedIconPath": "/static/tabbar/home_1.png",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/surprise/surprise",
+				"iconPath": "/static/tabbar/surprise.png",
+				"selectedIconPath": "/static/tabbar/surprise_1.png",
+				"text": "惊喜"
+			},
+			{
+				"pagePath": "pages/service/service",
+				"iconPath": "/static/tabbar/service.png",
+				"selectedIconPath": "/static/tabbar/service_1.png",
+				"text": "服务"
+			},
+			{
+				"pagePath": "pages/friend/friend",
+				"iconPath": "/static/tabbar/friend.png",
+				"selectedIconPath": "/static/tabbar/friend_1.png",
+				"text": "朋友"
+			},
+			{
+				"pagePath": "pages/user/user",
+				"iconPath": "/static/tabbar/my.png",
+				"selectedIconPath": "/static/tabbar/my_1.png",
+				"text": "我的"
+			}
+		]
+	},
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "",
+		"navigationBarBackgroundColor": "#FFFFFF",
+		"backgroundColor": "#F8F8F8",
+		"h5": {
+			"navigationStyle": "custom"
+		}
+
+	},
+	"easycom": {
+		"autoscan": true,
+		"custom": {
+			"^u-(.*)": "@/components/uview-ui/components/u-$1/u-$1.vue"
+		}
+	}
+}

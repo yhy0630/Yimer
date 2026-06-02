@@ -1,0 +1,58 @@
+/**
+ * Global SCSS variables for uni-app and uView.
+ */
+
+/* Base theme */
+$-color-primary: #143080;
+$-color-border: #e5e5e5;
+$-color-black: #101010;
+$-color-white: #ffffff;
+$-color-normal: #333333;
+$-color-lighter: #666666;
+$-color-muted: #999999;
+$-color-body: #f6f6f6;
+
+$-solid-border: 1px solid $-color-border;
+$-dashed-border: 1px dashed $-color-border;
+
+/* App style aliases used by styles/common.scss */
+$app-color-primary: $-color-primary;
+$app-color-border: $-color-border;
+$app-color-black: $-color-black;
+$app-color-white: $-color-white;
+$app-color-normal: $-color-normal;
+$app-color-minor: $-color-lighter;
+$app-color-lighter: $-color-lighter;
+$app-color-muted: $-color-muted;
+$app-color-body: $-color-body;
+$app-page-side-padding: 44rpx;
+
+/* uView */
+$u-type-primary: #143080;
+$u-type-error: #fa3534;
+$u-type-warning: #ff9900;
+$u-type-success: #19be6b;
+$u-type-info: #909399;
+$u-type-primary-light: #e8eefb;
+$u-type-error-light: #fef0f0;
+$u-type-warning-light: #fdf6ec;
+$u-type-success-light: #dbf1e1;
+$u-type-info-light: #f4f4f5;
+$u-type-primary-dark: #0f2665;
+$u-type-error-dark: #dd6161;
+$u-type-warning-dark: #f29100;
+$u-type-success-dark: #18b566;
+$u-type-info-dark: #82848a;
+$u-type-primary-disabled: #8fa1cf;
+$u-type-error-disabled: #fab6b6;
+$u-type-warning-disabled: #fcbd71;
+$u-type-success-disabled: #71d5a1;
+$u-type-info-disabled: #c8c9cc;
+$u-main-color: #303133;
+$u-content-color: #606266;
+$u-tips-color: #909399;
+$u-light-color: #c0c4cc;
+$u-border-color: #e4e7ed;
+$u-bg-color: #f3f4f6;
+$u-form-item-border-color: #dcdfe6;
+$u-form-item-height: 70rpx;
