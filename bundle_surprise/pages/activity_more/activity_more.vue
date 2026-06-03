@@ -1,105 +1,91 @@
 <template>
-	<view class="surprise-activity-more-page">
-		<view class="surprise-activity-more-page__header" :style="{ paddingTop: `${statusBarHeight}px` }">
-			<view class="surprise-activity-more-page__nav page-shell">
-				<view class="surprise-activity-more-page__back" @tap="goBack">
+	<view class="surprise-activity-page">
+		<view class="surprise-activity-page__header" :style="{ paddingTop: `${statusBarHeight}px` }">
+			<view class="page-shell surprise-activity-page__nav">
+				<view class="surprise-activity-page__back" @tap="goBack">
 					<u-icon name="arrow-left" size="46" color="#23262d"></u-icon>
 				</view>
 			</view>
 
-			<view class="page-shell surprise-activity-more-page__toolbar">
-				<view class="surprise-activity-more-page__location flex row-between">
-					<view class="surprise-activity-more-page__location-main flex" @tap="openCampusSelector">
-						<image class="surprise-activity-more-page__location-icon" src="/static/images/address.png" mode="aspectFit"></image>
-						<text class="surprise-activity-more-page__location-text line-1">{{ locationText }}</text>
-					</view>
-					<view class="surprise-activity-more-page__location-switch flex" @tap="openCampusSelector">
-						<image class="surprise-activity-more-page__switch-icon" src="/static/images/qiehuan.png" mode="aspectFit"></image>
-						<text class="surprise-activity-more-page__switch-text">切换</text>
-					</view>
-				</view>
-
-				<view class="surprise-activity-more-page__search">
-					<u-icon name="search" size="40" color="#b9bcc3"></u-icon>
-					<view class="surprise-activity-more-page__search-divider"></view>
+			<view class="page-shell surprise-activity-page__toolbar">
+				<view class="surprise-activity-page__search">
+					<u-icon name="search" size="38" color="#b8b8b8"></u-icon>
+					<view class="surprise-activity-page__search-divider"></view>
 					<input
 						v-model.trim="keyword"
-						class="surprise-activity-more-page__search-input"
+						class="surprise-activity-page__search-input"
 						placeholder="请搜索"
-						placeholder-class="surprise-activity-more-page__search-placeholder"
+						placeholder-class="surprise-activity-page__search-placeholder"
 						confirm-type="search"
 					/>
 				</view>
 
-				<scroll-view class="surprise-activity-more-page__category-scroll" scroll-x show-scrollbar="false">
-					<view class="surprise-activity-more-page__category-list">
-						<view
-							v-for="item in categories"
-							:key="item.id"
-							:class="['surprise-activity-more-page__category-chip', selectedCategoryId === item.id ? 'is-active' : '']"
-							@tap="selectedCategoryId = item.id"
-						>
-							{{ item.label }}
+				<view class="surprise-activity-page__filters">
+					<view class="surprise-activity-page__filters-main">
+						<view class="surprise-activity-page__filter-item" @tap="openFilterSheet('city')">
+							<text class="line-1">{{ currentCityLabel }}</text>
+							<u-icon name="arrow-down" size="18" color="#8f95a3"></u-icon>
+						</view>
+						<view class="surprise-activity-page__filter-item" @tap="openFilterSheet('status')">
+							<text class="line-1">{{ currentStatusLabel }}</text>
+							<u-icon name="arrow-down" size="18" color="#8f95a3"></u-icon>
+						</view>
+						<view class="surprise-activity-page__filter-item" @tap="openFilterSheet('type')">
+							<text class="line-1">{{ currentTypeLabel }}</text>
+							<u-icon name="arrow-down" size="18" color="#8f95a3"></u-icon>
 						</view>
 					</view>
-				</scroll-view>
-
-				<view class="surprise-activity-more-page__sort-tabs">
 					<view
-						v-for="item in sortTabs"
-						:key="item.id"
-						:class="['surprise-activity-more-page__sort-tab', selectedSortId === item.id ? 'is-active' : '']"
-						@tap="selectedSortId = item.id"
+						:class="['surprise-activity-page__member-filter', filters.memberOnly ? 'is-active' : '']"
+						@tap="toggleMemberOnly"
 					>
-						{{ item.label }}
+						黑金专属
 					</view>
 				</view>
 			</view>
 		</view>
 
-		<view class="page-shell surprise-activity-more-page__body">
-			<view v-if="displayGoods.length" class="surprise-activity-more-page__goods-list">
+		<view class="page-shell surprise-activity-page__body">
+			<view v-if="displayActivities.length" class="surprise-activity-page__list">
 				<view
-					v-for="item in displayGoods"
+					v-for="item in displayActivities"
 					:key="item.id"
-					class="surprise-activity-more-page__goods-card"
-					@tap="handleGoodSelect(item)"
+					class="surprise-activity-page__card"
+					@tap="openActivity(item)"
 				>
-					<image class="surprise-activity-more-page__goods-image" :src="item.image" mode="aspectFill"></image>
+					<image class="surprise-activity-page__thumb" :src="item.image" mode="aspectFill"></image>
 
-					<view class="surprise-activity-more-page__goods-content">
-						<text class="surprise-activity-more-page__goods-title line-2">{{ item.name }}</text>
-
-						<view class="surprise-activity-more-page__goods-meta">
-							<text class="surprise-activity-more-page__goods-rating">{{ item.ratingText }}</text>
-							<text class="surprise-activity-more-page__goods-divider">|</text>
-							<text class="surprise-activity-more-page__goods-recommend">{{ item.recommendText }}</text>
-						</view>
-
-						<view class="surprise-activity-more-page__goods-price-row">
-							<text class="surprise-activity-more-page__goods-price">￥{{ item.price }}</text>
-							<view class="surprise-activity-more-page__goods-market-wrap">
-								<view class="surprise-activity-more-page__goods-market-icon"></view>
-								<text class="surprise-activity-more-page__goods-market-price">{{ item.marketPrice }}</text>
-							</view>
+					<view class="surprise-activity-page__content">
+						<text class="surprise-activity-page__title line-2">{{ item.title }}</text>
+						<text class="surprise-activity-page__date">{{ item.date }}</text>
+						<view class="surprise-activity-page__meta">
+							<text class="surprise-activity-page__signup">{{ item.signupText }}</text>
+							<text class="surprise-activity-page__separator">|</text>
+							<text :class="['surprise-activity-page__status', `is-${item.statusTone}`]">{{ item.status }}</text>
 						</view>
 					</view>
 				</view>
 			</view>
 
-			<view v-else class="surprise-activity-more-page__empty">
-				<text class="surprise-activity-more-page__empty-title">没有找到相关项目</text>
-				<text class="surprise-activity-more-page__empty-desc">试试更换搜索词或分类看看</text>
+			<view v-else class="surprise-activity-page__empty">
+				<text class="surprise-activity-page__empty-title">没有找到相关活动</text>
+				<text class="surprise-activity-page__empty-desc">试试更换搜索词或筛选条件看看</text>
 			</view>
 		</view>
+
+		<u-action-sheet
+			v-model="showFilterSheet"
+			:list="filterSheetList"
+			:cancel-btn="true"
+			:safe-area-inset-bottom="true"
+			border-radius="28"
+			@click="handleFilterSelect"
+		></u-action-sheet>
 	</view>
 </template>
 
 <script>
-import {
-	DEFAULT_CAMPUS,
-	formatCampusLocation
-} from '@/config/campus'
+import { getSurpriseActivityList } from '../activity_detail/activity.data'
 
 function getStatusBarHeight() {
 	try {
@@ -114,166 +100,102 @@ function normalizeKeyword(keyword) {
 	return String(keyword || '').trim().toLowerCase()
 }
 
-function cloneList(list) {
-	return JSON.parse(JSON.stringify(list))
+const FILTER_OPTIONS = {
+	city: [
+		{ label: '全部城市', value: '' },
+		{ label: '北京', value: '北京' },
+		{ label: '上海', value: '上海' },
+		{ label: '成都', value: '成都' }
+	],
+	status: [
+		{ label: '活动状态', value: '' },
+		{ label: '报名中', value: '报名中' },
+		{ label: '已报名', value: '已报名' },
+		{ label: '报名已截止', value: '报名已截止' },
+		{ label: '活动结束', value: '活动结束' }
+	],
+	type: [
+		{ label: '活动类型', value: '' },
+		{ label: '会员专场', value: '会员专场' },
+		{ label: '美食', value: '美食' },
+		{ label: '美学体验', value: '美学体验' },
+		{ label: '其他', value: '其他' }
+	]
 }
-
-const PAGE_CATEGORIES = [
-	{ id: 'skin', label: '皮肤管理' },
-	{ id: 'repair', label: '补水修护' },
-	{ id: 'bright', label: '美白淡斑' },
-	{ id: 'antiage', label: '抗衰紧致' },
-	{ id: 'inject', label: '注射微整' }
-]
-
-const PAGE_SORT_TABS = [
-	{ id: 'default', label: '综合' },
-	{ id: 'sales', label: '销量' },
-	{ id: 'heat', label: '热度' },
-	{ id: 'price', label: '价格' }
-]
-
-const PAGE_GOODS_LIST = [
-	{
-		id: 101,
-		categoryId: 'skin',
-		name: '年度医美计划',
-		image: '/static/linshi/01.png',
-		price: 699,
-		marketPrice: 6990,
-		ratingText: '100%好评率',
-		recommendText: '1w+推荐',
-		salesSum: 388,
-		heat: 92,
-		tags: ['皮肤管理', '年度计划']
-	},
-	{
-		id: 102,
-		categoryId: 'skin',
-		name: '水光亮肤年卡',
-		image: '/static/linshi/02.png',
-		price: 799,
-		marketPrice: 7590,
-		ratingText: '98%好评率',
-		recommendText: '9k+推荐',
-		salesSum: 356,
-		heat: 90,
-		tags: ['水光亮肤', '年卡']
-	},
-	{
-		id: 103,
-		categoryId: 'repair',
-		name: '补水修护护理',
-		image: '/static/linshi/03.png',
-		price: 699,
-		marketPrice: 6990,
-		ratingText: '99%好评率',
-		recommendText: '8k+推荐',
-		salesSum: 268,
-		heat: 88,
-		tags: ['补水修护', '舒缓维稳']
-	},
-	{
-		id: 104,
-		categoryId: 'bright',
-		name: '焕亮透白计划',
-		image: '/static/linshi/04.png',
-		price: 899,
-		marketPrice: 8990,
-		ratingText: '97%好评率',
-		recommendText: '1.1w+推荐',
-		salesSum: 312,
-		heat: 91,
-		tags: ['焕亮透白', '淡化暗沉']
-	},
-	{
-		id: 105,
-		categoryId: 'antiage',
-		name: '胶原紧致管理',
-		image: '/static/linshi/05.png',
-		price: 999,
-		marketPrice: 9990,
-		ratingText: '98%好评率',
-		recommendText: '7k+推荐',
-		salesSum: 226,
-		heat: 89,
-		tags: ['抗衰紧致', '胶原提升']
-	},
-	{
-		id: 106,
-		categoryId: 'inject',
-		name: '面部精修方案',
-		image: '/static/linshi/02.png',
-		price: 1280,
-		marketPrice: 12800,
-		ratingText: '96%好评率',
-		recommendText: '6k+推荐',
-		salesSum: 184,
-		heat: 86,
-		tags: ['注射微整', '面部轮廓']
-	}
-]
 
 export default {
 	data() {
 		return {
 			statusBarHeight: getStatusBarHeight(),
-			currentCampus: DEFAULT_CAMPUS,
-			locationText: formatCampusLocation(DEFAULT_CAMPUS),
 			keyword: '',
-			categories: PAGE_CATEGORIES,
-			sortTabs: PAGE_SORT_TABS,
-			selectedCategoryId: PAGE_CATEGORIES[0].id,
-			selectedSortId: PAGE_SORT_TABS[0].id,
-			goodsList: cloneList(PAGE_GOODS_LIST)
+			filters: {
+				city: '',
+				status: '',
+				type: '',
+				memberOnly: false
+			},
+			showFilterSheet: false,
+			activeFilterKey: 'city',
+			activities: getSurpriseActivityList()
 		}
 	},
 	computed: {
-		displayGoods() {
+		currentCityLabel() {
+			return this.getFilterLabel('city', this.filters.city)
+		},
+		currentStatusLabel() {
+			return this.getFilterLabel('status', this.filters.status)
+		},
+		currentTypeLabel() {
+			return this.getFilterLabel('type', this.filters.type)
+		},
+		filterSheetList() {
+			const options = FILTER_OPTIONS[this.activeFilterKey] || []
+			const selectedValue = this.filters[this.activeFilterKey]
+
+			return options.map((item) => ({
+				text: item.label,
+				color: item.value === selectedValue ? '#143080' : '#1f232b'
+			}))
+		},
+		displayActivities() {
 			const keyword = normalizeKeyword(this.keyword)
-			let list = this.goodsList.filter((item) => item.categoryId === this.selectedCategoryId)
 
-			if (!list.length) {
-				list = this.goodsList.slice()
-			}
+			return this.activities.filter((item) => {
+				if (this.filters.city && item.city !== this.filters.city) {
+					return false
+				}
 
-			if (keyword) {
-				list = list.filter((item) => {
-					const searchText = [item.name, item.ratingText, item.recommendText]
-						.concat(item.tags || [])
-						.join(' ')
-						.toLowerCase()
+				if (this.filters.status && item.status !== this.filters.status) {
+					return false
+				}
 
-					return searchText.includes(keyword)
-				})
-			}
+				if (this.filters.type && item.type !== this.filters.type) {
+					return false
+				}
 
-			const sortedList = list.slice()
+				if (this.filters.memberOnly && !item.memberOnly) {
+					return false
+				}
 
-			if (this.selectedSortId === 'sales') {
-				return sortedList.sort((first, second) => second.salesSum - first.salesSum)
-			}
+				if (!keyword) {
+					return true
+				}
 
-			if (this.selectedSortId === 'heat') {
-				return sortedList.sort((first, second) => second.heat - first.heat)
-			}
+				const searchText = [item.title, item.date, item.signupText, item.status, item.city, item.type]
+					.join(' ')
+					.toLowerCase()
 
-			if (this.selectedSortId === 'price') {
-				return sortedList.sort((first, second) => first.price - second.price)
-			}
-
-			return sortedList
-		}
-	},
-	onLoad(options = {}) {
-		if (options.categoryId) {
-			const hasCategory = this.categories.some((item) => item.id === options.categoryId)
-			if (hasCategory) {
-				this.selectedCategoryId = options.categoryId
-			}
+				return searchText.includes(keyword)
+			})
 		}
 	},
 	methods: {
+		getFilterLabel(key, value) {
+			const options = FILTER_OPTIONS[key] || []
+			const activeItem = options.find((item) => item.value === value)
+			return activeItem ? activeItem.label : options[0].label
+		},
 		goBack() {
 			const pages = getCurrentPages()
 
@@ -288,24 +210,26 @@ export default {
 				url: '/pages/surprise/surprise'
 			})
 		},
-		openCampusSelector() {
-			uni.navigateTo({
-				url: `/bundle/pages/campus/campus?mode=select&source=surprise-more&currentCampusId=${this.currentCampus.id}`,
-				success: (res) => {
-					res.eventChannel.on('campusSelected', ({ campus }) => {
-						this.currentCampus = campus
-						this.locationText = formatCampusLocation(campus)
-					})
-				}
-			})
+		openFilterSheet(key) {
+			this.activeFilterKey = key
+			this.showFilterSheet = true
 		},
-		handleGoodSelect(item) {
-			if (!item || !item.id) {
+		handleFilterSelect(index) {
+			const options = FILTER_OPTIONS[this.activeFilterKey] || []
+			const target = options[index]
+
+			if (!target) {
 				return
 			}
 
+			this.filters[this.activeFilterKey] = target.value
+		},
+		toggleMemberOnly() {
+			this.filters.memberOnly = !this.filters.memberOnly
+		},
+		openActivity(item) {
 			uni.navigateTo({
-				url: `/bundle_surprise/pages/goods_detail/goods_detail?id=${item.id}&name=${encodeURIComponent(item.name || '')}&price=${item.price || ''}&marketPrice=${item.marketPrice || ''}&source=activity-more`
+				url: `/bundle_surprise/pages/activity_detail/activity_detail?id=${item.id}`
 			})
 		}
 	}
@@ -313,26 +237,25 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.surprise-activity-more-page {
+.surprise-activity-page {
 	min-height: 100vh;
 	background: #ffffff;
 }
 
-.surprise-activity-more-page__header {
+.surprise-activity-page__header {
 	position: sticky;
 	top: 0;
 	z-index: 10;
 	background: rgba(255, 255, 255, 0.98);
 }
 
-.surprise-activity-more-page__nav {
-	position: relative;
+.surprise-activity-page__nav {
 	display: flex;
 	align-items: center;
 	height: 96rpx;
 }
 
-.surprise-activity-more-page__back {
+.surprise-activity-page__back {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -341,251 +264,154 @@ export default {
 	margin-left: -12rpx;
 }
 
-.surprise-activity-more-page__toolbar {
-	padding-top: 10rpx;
-	padding-bottom: 18rpx;
+.surprise-activity-page__toolbar {
+	padding-top: 8rpx;
+	padding-bottom: 20rpx;
 	background: #ffffff;
 }
 
-.surprise-activity-more-page__location {
-	gap: 24rpx;
-}
-
-.surprise-activity-more-page__location-main,
-.surprise-activity-more-page__location-switch {
-	min-width: 0;
-}
-
-.surprise-activity-more-page__location-icon {
-	width: 28rpx;
-	height: 28rpx;
-	margin-top: 2rpx;
-	flex: none;
-}
-
-.surprise-activity-more-page__location-text {
-	margin-left: 12rpx;
-	color: #22262f;
-	font-size: 28rpx;
-	line-height: 1.4;
-}
-
-.surprise-activity-more-page__location-switch {
-	flex: none;
-}
-
-.surprise-activity-more-page__switch-icon {
-	width: 34rpx;
-	height: 34rpx;
-}
-
-.surprise-activity-more-page__switch-text {
-	margin-left: 8rpx;
-	color: #323741;
-	font-size: 28rpx;
-	line-height: 1.2;
-}
-
-.surprise-activity-more-page__search {
+.surprise-activity-page__search {
 	display: flex;
 	align-items: center;
-	height: 104rpx;
-	margin-top: 34rpx;
+	height: 100rpx;
 	padding: 0 30rpx;
-	border-radius: 24rpx;
-	background: #f7f7f8;
+	border-radius: 20rpx;
+	background: #f7f7f7;
 }
 
-.surprise-activity-more-page__search-divider {
+.surprise-activity-page__search-divider {
 	width: 2rpx;
-	height: 34rpx;
+	height: 32rpx;
 	margin: 0 22rpx;
-	background: #d8d9de;
+	background: #dddddd;
 }
 
-.surprise-activity-more-page__search-input {
+.surprise-activity-page__search-input {
 	flex: 1;
 	min-width: 0;
-	height: 104rpx;
-	color: #252932;
+	height: 100rpx;
 	font-size: 32rpx;
+	color: #22262d;
 }
 
-.surprise-activity-more-page__search-placeholder {
-	color: #c7c8cc;
+.surprise-activity-page__search-placeholder {
 	font-size: 32rpx;
+	color: #c8c8c8;
 }
 
-.surprise-activity-more-page__category-scroll {
-	margin-top: 30rpx;
-	white-space: nowrap;
+.surprise-activity-page__filters {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-top: 34rpx;
+	gap: 20rpx;
 }
 
-.surprise-activity-more-page__category-list {
-	display: inline-flex;
-	padding-right: 44rpx;
+.surprise-activity-page__filters-main {
+	display: flex;
+	align-items: center;
+	flex: 1;
+	min-width: 0;
 }
 
-.surprise-activity-more-page__category-chip {
-	flex: none;
-	margin-right: 20rpx;
-	padding: 20rpx 34rpx;
-	border-radius: 20rpx;
-	background: #f3f4f6;
-	color: #8a8f9a;
+.surprise-activity-page__filter-item {
+	display: flex;
+	align-items: center;
+	max-width: 190rpx;
+	margin-right: 42rpx;
 	font-size: 28rpx;
-	line-height: 1;
+	line-height: 1.2;
+	color: #2c313d;
 }
 
-.surprise-activity-more-page__category-chip.is-active {
-	background: #143080;
-	color: #ffffff;
+.surprise-activity-page__filter-item .u-icon {
+	flex: none;
+	margin-left: 10rpx;
+}
+
+.surprise-activity-page__member-filter {
+	flex: none;
+	font-size: 28rpx;
+	line-height: 1.2;
+	color: #2c313d;
+}
+
+.surprise-activity-page__member-filter.is-active {
+	color: #143080;
 	font-weight: 600;
 }
 
-.surprise-activity-more-page__sort-tabs {
-	display: flex;
-	align-items: center;
-	margin-top: 32rpx;
-}
-
-.surprise-activity-more-page__sort-tab {
-	position: relative;
-	margin-right: 72rpx;
-	padding-bottom: 18rpx;
-	color: #707584;
-	font-size: 28rpx;
-	line-height: 1;
-}
-
-.surprise-activity-more-page__sort-tab.is-active {
-	color: #143080;
-	font-weight: 700;
-}
-
-.surprise-activity-more-page__sort-tab.is-active::after {
-	content: '';
-	position: absolute;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	height: 6rpx;
-	border-radius: 999rpx;
-	background: #143080;
-}
-
-.surprise-activity-more-page__body {
-	padding-top: 20rpx;
-	padding-bottom: calc(env(safe-area-inset-bottom) + 60rpx);
+.surprise-activity-page__body {
+	padding-top: 6rpx;
+	padding-bottom: calc(env(safe-area-inset-bottom) + 56rpx);
 	background: #ffffff;
 }
 
-.surprise-activity-more-page__goods-card {
+.surprise-activity-page__card {
 	display: flex;
 	align-items: flex-start;
 	padding: 28rpx 0;
 }
 
-.surprise-activity-more-page__goods-card + .surprise-activity-more-page__goods-card {
-	border-top: 1rpx solid #f2f3f6;
-}
-
-.surprise-activity-more-page__goods-image {
+.surprise-activity-page__thumb {
 	flex: none;
-	width: 182rpx;
-	height: 182rpx;
+	width: 184rpx;
+	height: 184rpx;
 	border-radius: 18rpx;
 	background: #edf1f7;
 }
 
-.surprise-activity-more-page__goods-content {
+.surprise-activity-page__content {
 	flex: 1;
 	min-width: 0;
-	margin-left: 24rpx;
+	margin-left: 30rpx;
 	padding-top: 8rpx;
 }
 
-.surprise-activity-more-page__goods-title {
-	color: #1b1f27;
+.surprise-activity-page__title {
 	font-size: 34rpx;
-	line-height: 1.32;
-	font-weight: 500;
+	line-height: 1.34;
+	color: #1d2129;
 }
 
-.surprise-activity-more-page__goods-meta {
-	display: flex;
-	align-items: center;
-	margin-top: 22rpx;
-	color: #555b67;
+.surprise-activity-page__date {
+	display: block;
+	margin-top: 18rpx;
 	font-size: 24rpx;
-	line-height: 1;
+	line-height: 1.2;
+	color: #9a9ea9;
 }
 
-.surprise-activity-more-page__goods-divider {
-	margin: 0 16rpx;
-	color: #d4d7de;
-}
-
-.surprise-activity-more-page__goods-recommend {
-	color: #e3b256;
-}
-
-.surprise-activity-more-page__goods-price-row {
+.surprise-activity-page__meta {
 	display: flex;
 	align-items: center;
-	margin-top: 44rpx;
+	margin-top: 24rpx;
+	font-size: 24rpx;
+	line-height: 1.2;
 }
 
-.surprise-activity-more-page__goods-price {
-	color: #8c919d;
-	font-size: 28rpx;
-	line-height: 1;
+.surprise-activity-page__signup,
+.surprise-activity-page__separator {
+	color: #9a9ea9;
 }
 
-.surprise-activity-more-page__goods-market-wrap {
-	display: flex;
-	align-items: center;
-	margin-left: 20rpx;
+.surprise-activity-page__separator {
+	margin: 0 12rpx;
 }
 
-.surprise-activity-more-page__goods-market-icon {
-	position: relative;
-	width: 28rpx;
-	height: 18rpx;
-	border: 2rpx solid #a9aeb8;
-	border-radius: 999rpx;
-	box-sizing: border-box;
+.surprise-activity-page__status {
+	color: #9a9ea9;
 }
 
-.surprise-activity-more-page__goods-market-icon::before,
-.surprise-activity-more-page__goods-market-icon::after {
-	content: '';
-	position: absolute;
-	left: -2rpx;
-	width: 28rpx;
-	height: 18rpx;
-	border: 2rpx solid #a9aeb8;
-	border-radius: 999rpx;
-	box-sizing: border-box;
-	background: #ffffff;
+.surprise-activity-page__status.is-primary {
+	color: #143080;
 }
 
-.surprise-activity-more-page__goods-market-icon::before {
-	top: -8rpx;
+.surprise-activity-page__status.is-muted {
+	color: #9a9ea9;
 }
 
-.surprise-activity-more-page__goods-market-icon::after {
-	top: 8rpx;
-}
-
-.surprise-activity-more-page__goods-market-price {
-	margin-left: 12rpx;
-	color: #8c919d;
-	font-size: 28rpx;
-	line-height: 1;
-}
-
-.surprise-activity-more-page__empty {
+.surprise-activity-page__empty {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -593,17 +419,17 @@ export default {
 	padding: 220rpx 0 180rpx;
 }
 
-.surprise-activity-more-page__empty-title {
-	color: #1f232b;
+.surprise-activity-page__empty-title {
 	font-size: 34rpx;
-	font-weight: 600;
 	line-height: 1.2;
+	font-weight: 600;
+	color: #1f232b;
 }
 
-.surprise-activity-more-page__empty-desc {
+.surprise-activity-page__empty-desc {
 	margin-top: 18rpx;
-	color: #959aa6;
 	font-size: 26rpx;
 	line-height: 1.4;
+	color: #959aa6;
 }
 </style>

@@ -68,6 +68,18 @@
 				}
 			},
 			{
+				"path": "pages/guide_review/guide_review",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/guide_review_success/guide_review_success",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
 				"path": "pages/sign_center/sign_center",
 				"style": {
 					"navigationStyle": "custom"
@@ -95,6 +107,36 @@
 				}
 			},
 			{
+				"path": "pages/project_records/project_records",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/project_records/detail",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/scan_take_number/scan_take_number",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/take_number_info/take_number_info",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/take_number_success/take_number_success",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
 				"path": "pages/campus/campus",
 				"style": {
 					"navigationStyle": "custom"
@@ -108,6 +150,12 @@
 			},
 			{
 				"path": "pages/city/city"
+			},
+			{
+				"path": "pages/doctor/list",
+				"style": {
+					"navigationStyle": "custom"
+				}
 			},
 			{
 				"path": "pages/doctor/detail",
@@ -197,7 +245,37 @@
 				}
 			},
 			{
+				"path": "pages/activity_detail/activity_detail",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/goods_more/goods_more",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
 				"path": "pages/goods_detail/goods_detail",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/checkout/checkout",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/cart/cart",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/pay_success/pay_success",
 				"style": {
 					"navigationStyle": "custom"
 				}
@@ -209,6 +287,95 @@
 		"pages": [
 			{
 				"path": "pages/appointment_register/appointment_register",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/appointment_success/appointment_success",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			}
+		]
+	},
+	{
+		"root": "bundle_user",
+		"pages": [
+			{
+				"path": "pages/address/address",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/address_form/address_form",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/emergency_contacts/emergency_contacts",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/settings/settings",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/account_destroy/account_destroy",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/profile_home/profile_home",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/order_list/order_list",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/wallet/wallet",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/payment_list/payment_list",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/payment_confirm/payment_confirm",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/payment_success/payment_success",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/appointment_records/appointment_records",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/medical_records/medical_records",
 				"style": {
 					"navigationStyle": "custom"
 				}

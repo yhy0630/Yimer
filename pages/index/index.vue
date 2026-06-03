@@ -227,7 +227,7 @@
 
 				<view class="section-block">
 					<doctor-intro-section title="名医简介" more-text="了解更多" :doctors="doctorList"
-						@more="showNotice('了解更多医生')" @select="handleDoctorSelect" />
+						@more="openDoctorList" @select="handleDoctorSelect" />
 				</view>
 
 				<view class="section-block clinic-block">
@@ -1026,6 +1026,11 @@
 					url: `/bundle/pages/doctor/detail?id=${doctor.id}&source=home`
 				})
 			},
+			openDoctorList() {
+				uni.navigateTo({
+					url: `/bundle/pages/doctor/list?source=home&currentCampusId=${this.currentCampus.id}`
+				})
+			},
 			openMomentDetail(post) {
 				if (!post || !post.id) {
 					return
@@ -1070,6 +1075,13 @@
 			},
 			handlePlusMenuSelect(item) {
 				this.showPlusMenu = false
+
+				if (item.key === 'scan') {
+					uni.navigateTo({
+						url: '/bundle/pages/scan_take_number/scan_take_number'
+					})
+					return
+				}
 
 				if (item.scene) {
 					this.openPublishPage(item.scene)
