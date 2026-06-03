@@ -13,93 +13,166 @@
 					</text>
 				</view>
 
-				<text class="friend-page__clear" @tap="handleClearUnread">清除未读</text>
+				<text v-if="activeTab === 'conversation'" class="friend-page__clear" @tap="handleClearUnread">
+					清除未读
+				</text>
 			</view>
 
-			<view
-				v-for="section in activeSections"
-				:key="section.key"
-				:class="['friend-page__section', section.divider ? 'has-divider' : '']"
-			>
-				<view
-					v-for="item in section.items"
-					:key="item.id"
-					class="friend-page__item"
-					@tap="handleConversationTap(item)"
-				>
-					<view class="friend-page__avatar-shell">
-						<view v-if="item.avatarType === 'system'" class="friend-page__system-avatar">
-							<u-icon name="bell" size="42" color="#27449A"></u-icon>
-						</view>
+			<view v-if="activeTab === 'group'" class="friend-community">
+				<view class="friend-community__head" @tap="goCommunityDiscover">
+					<text class="friend-community__head-title">发现社群</text>
+					<u-icon name="arrow-right" size="30" color="#77797E"></u-icon>
+				</view>
 
-						<view v-else-if="item.avatarType === 'group'" class="friend-page__group-avatar">
+				<swiper
+					class="friend-community__banner-swiper"
+					indicator-dots
+					autoplay
+					circular
+					interval="3500"
+					duration="500"
+					indicator-active-color="rgba(255,255,255,0.95)"
+					indicator-color="rgba(255,255,255,0.34)"
+				>
+					<swiper-item
+						v-for="(banner, bannerIndex) in communityBannerList"
+						:key="`banner-${bannerIndex}`"
+					>
+						<view class="friend-community__banner-card">
+							<image class="friend-community__banner-image" :src="banner.image" mode="aspectFill" />
+							<view class="friend-community__banner-mask"></view>
+							<view class="friend-community__banner-content">
+								<text class="friend-community__banner-title">{{ banner.title }}</text>
+								<text class="friend-community__banner-desc">{{ banner.desc }}</text>
+							</view>
+						</view>
+					</swiper-item>
+				</swiper>
+
+				<view class="friend-community__list">
+					<view
+						v-for="(item, index) in communityList"
+						:key="item.id"
+						class="friend-community__item"
+						@tap="handleConversationTap(item)"
+					>
+						<view class="friend-community__cover-wrap">
 							<image
-								v-for="(thumb, thumbIndex) in item.groupThumbs"
-								:key="`${item.id}-${thumbIndex}`"
-								class="friend-page__group-thumb"
-								:src="thumb"
+								class="friend-community__cover"
+								:src="item.cover || getCommunityIcon(index)"
+								mode="aspectFill"
+							/>
+						</view>
+						<view class="friend-community__body">
+							<view class="friend-community__meta">
+								<text class="friend-community__meta-chip">{{ item.city }}</text>
+								<text class="friend-community__meta-chip">{{ item.tag }}</text>
+							</view>
+							<text class="friend-community__name">{{ item.title }}</text>
+							<view class="friend-community__footer">
+								<view class="friend-community__members">
+									<image
+										v-for="(avatar, avatarIndex) in item.memberAvatars"
+										:key="`${item.id}-${avatarIndex}`"
+										class="friend-community__member-avatar"
+										:src="avatar"
+										mode="aspectFill"
+									/>
+									<text class="friend-community__member-count">{{ item.memberCount }}</text>
+								</view>
+							</view>
+						</view>
+						<view class="friend-community__action">查看</view>
+					</view>
+				</view>
+			</view>
+
+			<view v-else>
+				<view
+					v-for="section in activeSections"
+					:key="section.key"
+					:class="['friend-page__section', section.divider ? 'has-divider' : '']"
+				>
+					<view
+						v-for="item in section.items"
+						:key="item.id"
+						class="friend-page__item"
+						@tap="handleConversationTap(item)"
+					>
+						<view class="friend-page__avatar-shell">
+							<view v-if="item.avatarType === 'system'" class="friend-page__system-avatar">
+								<u-icon name="bell" size="42" color="#27449A"></u-icon>
+							</view>
+
+							<view v-else-if="item.avatarType === 'group'" class="friend-page__group-avatar">
+								<image
+									v-for="(thumb, thumbIndex) in item.groupThumbs"
+									:key="`${item.id}-${thumbIndex}`"
+									class="friend-page__group-thumb"
+									:src="thumb"
+									mode="aspectFill"
+								/>
+							</view>
+
+							<image
+								v-else
+								class="friend-page__avatar"
+								:src="item.avatar"
 								mode="aspectFill"
 							/>
 						</view>
 
-						<image
-							v-else
-							class="friend-page__avatar"
-							:src="item.avatar"
-							mode="aspectFill"
-						/>
-					</view>
-
-					<view class="friend-page__body">
-						<view class="friend-page__main">
-							<view class="friend-page__title-row">
-								<view class="friend-page__title-wrap">
-									<text class="friend-page__title line-1">{{ item.title }}</text>
-									<view v-if="item.badges && item.badges.length" class="friend-page__badges">
-										<text
-											v-for="badge in item.badges"
-											:key="badge.text"
-											:class="[
-												'friend-page__badge',
-												`friend-page__badge--${badge.variant}`
-											]"
-										>
-											{{ badge.text }}
-										</text>
+						<view class="friend-page__body">
+							<view class="friend-page__main">
+								<view class="friend-page__title-row">
+									<view class="friend-page__title-wrap">
+										<text class="friend-page__title line-1">{{ item.title }}</text>
+										<view v-if="item.badges && item.badges.length" class="friend-page__badges">
+											<text
+												v-for="badge in item.badges"
+												:key="badge.text"
+												:class="[
+													'friend-page__badge',
+													`friend-page__badge--${badge.variant}`
+												]"
+											>
+												{{ badge.text }}
+											</text>
+										</view>
+										<view v-if="item.showHot" class="friend-page__hot"></view>
 									</view>
-									<view v-if="item.showHot" class="friend-page__hot"></view>
+
+									<view class="friend-page__meta">
+										<text :class="['friend-page__time', item.isRecent ? 'is-recent' : '']">
+											{{ item.timeText }}
+										</text>
+										<u-icon
+											v-if="item.muted"
+											name="volume-off"
+											size="28"
+											color="#9A9DA8"
+										></u-icon>
+										<text
+											v-else-if="item.unreadCount"
+											class="friend-page__count"
+										>
+											{{ item.unreadCount }}
+										</text>
+										<view v-else-if="item.unreadDot" class="friend-page__dot"></view>
+									</view>
 								</view>
 
-								<view class="friend-page__meta">
-									<text :class="['friend-page__time', item.isRecent ? 'is-recent' : '']">
-										{{ item.timeText }}
-									</text>
-									<u-icon
-										v-if="item.muted"
-										name="volume-off"
-										size="28"
-										color="#9A9DA8"
-									></u-icon>
+								<view class="friend-page__preview-row">
 									<text
-										v-else-if="item.unreadCount"
-										class="friend-page__count"
+										v-if="item.previewPrefix"
+										class="friend-page__preview friend-page__preview--prefix"
 									>
-										{{ item.unreadCount }}
+										{{ item.previewPrefix }}
 									</text>
-									<view v-else-if="item.unreadDot" class="friend-page__dot"></view>
+									<text class="friend-page__preview friend-page__preview--main line-1">
+										{{ item.previewText }}
+									</text>
 								</view>
-							</view>
-
-							<view class="friend-page__preview-row">
-								<text
-									v-if="item.previewPrefix"
-									class="friend-page__preview friend-page__preview--prefix"
-								>
-									{{ item.previewPrefix }}
-								</text>
-								<text class="friend-page__preview friend-page__preview--main line-1">
-									{{ item.previewText }}
-								</text>
 							</view>
 						</view>
 					</view>
@@ -123,6 +196,73 @@ const TABS = [
 	{ key: 'conversation', label: '会话' },
 	{ key: 'group', label: '社群' },
 	{ key: 'contacts', label: '通讯录' }
+]
+
+const COMMUNITY_ICONS = [
+	'/static/linshi/10.png',
+	'/static/linshi/11.png',
+	'/static/linshi/12.png'
+]
+
+const COMMUNITY_BANNERS = [
+	{
+		image: '/static/linshi/09.png',
+		title: 'Care生活分享社群',
+		desc: '等你来加入'
+	},
+	{
+		image: '/static/linshi/09.png',
+		title: 'Care生活分享社群',
+		desc: '和有趣的人一起分享'
+	},
+	{
+		image: '/static/linshi/09.png',
+		title: 'Care生活分享社群',
+		desc: '发现更多同城伙伴'
+	}
+]
+
+const COMMUNITY_LIST = [
+	{
+		id: 'community-a',
+		title: '幸福社区',
+		city: '北京市',
+		tag: '交友',
+		memberCount: '296名成员',
+		memberAvatars: ['/static/linshi/01.png', '/static/linshi/02.png', '/static/linshi/01.png']
+	},
+	{
+		id: 'community-b',
+		title: '春夏焕颜',
+		city: '北京市',
+		tag: '交友',
+		memberCount: '296名成员',
+		memberAvatars: ['/static/linshi/02.png', '/static/linshi/01.png', '/static/linshi/02.png']
+	},
+	{
+		id: 'community-c',
+		title: '种草清单',
+		city: '北京市',
+		tag: '交友',
+		memberCount: '296名成员',
+		memberAvatars: ['/static/linshi/01.png', '/static/linshi/02.png', '/static/linshi/01.png']
+	},
+	{
+		id: 'community-d',
+		title: '焕颜计划',
+		city: '北京市',
+		tag: '交友',
+		memberCount: '296名成员',
+		memberAvatars: ['/static/linshi/02.png', '/static/linshi/01.png', '/static/linshi/02.png']
+	},
+	{
+		id: 'community-e',
+		title: '幸福社区',
+		city: '北京市',
+		tag: '交友',
+		memberCount: '296名成员',
+		memberAvatars: ['/static/linshi/01.png', '/static/linshi/02.png', '/static/linshi/01.png']
+	}
 ]
 
 const createPanels = () => ({
@@ -346,7 +486,9 @@ export default {
 			topInset: getTopInset(),
 			tabs: TABS,
 			activeTab: 'conversation',
-			panels: createPanels()
+			panels: createPanels(),
+			communityBannerList: COMMUNITY_BANNERS,
+			communityList: COMMUNITY_LIST
 		}
 	},
 	computed: {
@@ -372,6 +514,14 @@ export default {
 			uni.showToast({
 				title: item.title,
 				icon: 'none'
+			})
+		},
+		getCommunityIcon(index) {
+			return COMMUNITY_ICONS[index % COMMUNITY_ICONS.length]
+		},
+		goCommunityDiscover() {
+			uni.navigateTo({
+				url: '/bundle_friend/pages/community/community'
 			})
 		}
 	}
@@ -651,5 +801,187 @@ export default {
 .friend-page__preview--main {
 	flex: 1;
 	min-width: 0;
+}
+
+.friend-community {
+	margin-top: 18rpx;
+}
+
+.friend-community__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 2rpx;
+}
+
+.friend-community__head-title {
+	font-size: 38rpx;
+	font-weight: 700;
+	color: #151924;
+}
+
+.friend-community__banner-swiper {
+	width: 100%;
+	height: 333rpx;
+	margin-top: 38rpx;
+}
+
+.friend-community__banner-swiper :deep(.uni-swiper-dots) {
+	bottom: 16rpx;
+	display: flex;
+	align-items: center;
+}
+
+.friend-community__banner-swiper :deep(.uni-swiper-dot) {
+	width: 14rpx;
+	height: 8rpx;
+	margin: 0 4rpx;
+	border-radius: 999rpx;
+}
+
+.friend-community__banner-swiper :deep(.uni-swiper-dot-active) {
+	width: 24rpx;
+	height: 8rpx;
+	border-radius: 999rpx;
+}
+
+.friend-community__banner-card {
+	position: relative;
+	height: 100%;
+	border-radius: 18rpx;
+	overflow: hidden;
+}
+
+.friend-community__banner-image {
+	width: 100%;
+	height: 100%;
+}
+
+.friend-community__banner-mask {
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(180deg, rgba(12, 15, 22, 0.06) 0%, rgba(12, 15, 22, 0.42) 100%);
+}
+
+.friend-community__banner-content {
+	position: absolute;
+	left: 40rpx;
+	bottom: 43rpx;
+	display: flex;
+	flex-direction: column;
+}
+
+.friend-community__banner-title {
+	font-size: 39rpx;
+	font-weight: 500;
+	line-height: 1.15;
+	color: #ffffff;
+}
+
+.friend-community__banner-desc {
+	margin-top: 15rpx;
+	font-size: 26rpx;
+	color: rgba(255, 255, 255, 0.92);
+}
+
+.friend-community__list {
+	margin-top: 16rpx;
+}
+
+.friend-community__item {
+	display: flex;
+	align-items: stretch;
+	padding: 22rpx 0;
+}
+
+.friend-community__cover-wrap {
+	width: 150rpx;
+	height: 150rpx;
+	flex: none;
+	align-self: center;
+	border-radius: 14rpx;
+	overflow: hidden;
+	background: #edf1f9;
+}
+
+.friend-community__cover {
+	width: 100%;
+	height: 100%;
+	display: block;
+}
+
+.friend-community__body {
+	flex: 1;
+	min-width: 0;
+	margin-left: 20rpx;
+	padding-top: 2rpx;
+}
+
+.friend-community__meta {
+	display: flex;
+	align-items: center;
+}
+
+.friend-community__meta-chip {
+	height: 40rpx;
+	padding: 0 14rpx;
+	margin-right: 10rpx;
+	border-radius: 10rpx;
+	background: #f7f7f7;
+	font-size: 22rpx;
+	line-height: 40rpx;
+	color: #77797e;
+}
+
+.friend-community__name {
+	display: block;
+	margin-top: 20rpx;
+	font-size: 32rpx;
+	font-weight: 600;
+	line-height: 1.2;
+	color: #171a21;
+}
+
+.friend-community__footer {
+	display: flex;
+	align-items: center;
+	margin-top: 20rpx;
+}
+
+.friend-community__members {
+	display: flex;
+	align-items: center;
+	min-width: 0;
+}
+
+.friend-community__member-avatar {
+	width: 26rpx;
+	height: 26rpx;
+	margin-right: -6rpx;
+	border-radius: 50%;
+	border: 2rpx solid #ffffff;
+	background: #edf0f8;
+}
+
+.friend-community__member-count {
+	margin-left: 20rpx;
+	font-size: 22rpx;
+	color: #77797E;
+}
+
+.friend-community__action {
+	display: block;
+	width: 94rpx;
+	height: 48rpx;
+	line-height: 44rpx;
+	text-align: center;
+	align-self: center;
+	flex: none;
+	margin-left: 18rpx;
+	border-radius: 23rpx;
+	border: 2rpx solid #E1E2E5;
+	background: #ffffff;
+	font-size: 24rpx;
+	color: #77797E;
 }
 </style>
