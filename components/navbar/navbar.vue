@@ -63,10 +63,10 @@
 					icon: require('@/static/images/icon_search.png'),
 					type: 'navigate'
 				}, {
-					url: '/pages/shop_cart/shop_cart',
+					url: '/bundle_surprise/pages/cart/cart',
 					name: '购物车',
 					icon: require('@/static/images/icon_carts.png'),
-					type: 'switchTab'
+					type: 'navigate'
 				}, {
 					url: '/pages/user/user',
 					name: '个人中心',

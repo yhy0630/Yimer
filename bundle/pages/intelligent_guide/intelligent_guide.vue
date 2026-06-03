@@ -79,7 +79,7 @@
 							<view v-else-if="section.type === 'treatment'" class="treatment-list">
 								<view
 									v-for="(item, itemIndex) in section.items"
-									:key="item.project + itemIndex"
+									:key="item.id"
 									:class="['treatment-card', itemIndex !== 0 ? 'is-split' : '']"
 								>
 									<text class="treatment-card__project">
@@ -326,17 +326,38 @@ function normalizeDepartmentIndex(value) {
 	return index
 }
 
+function createDepartmentGuides() {
+	return DEPARTMENT_GUIDES.map((department, departmentIndex) => ({
+		...department,
+		sections: (department.sections || []).map((section) => {
+			if (section.type !== 'treatment') {
+				return section
+			}
+
+			return {
+				...section,
+				items: (section.items || []).map((item, itemIndex) => ({
+					...item,
+					id: item.id || `department-${departmentIndex}-treatment-${itemIndex}`
+				}))
+			}
+		})
+	}))
+}
+
 const SIGN_ACTION_ROUTE_MAP = {
 	'\u7b7e\u7f72\u77e5\u60c5\u540c\u610f\u4e66': 'consent',
 	'\u7b7e\u7f72\u6cbb\u7597\u5355': 'treatment'
 }
+
+const REVIEW_ACTION_TEXT = '去评价'
 
 export default {
 	data() {
 		return {
 			statusBarHeight: getStatusBarHeight(),
 			departmentTabs: DEPARTMENT_TABS,
-			departmentGuides: DEPARTMENT_GUIDES,
+			departmentGuides: createDepartmentGuides(),
 			activeDepartmentIndex: 0
 		}
 	},
@@ -371,6 +392,13 @@ export default {
 			if (entry) {
 				uni.navigateTo({
 					url: `/bundle/pages/sign_center/sign_center?entry=${entry}`
+				})
+				return
+			}
+
+			if (action === REVIEW_ACTION_TEXT) {
+				uni.navigateTo({
+					url: `/bundle/pages/guide_review/guide_review?department=${this.activeDepartmentIndex}`
 				})
 				return
 			}

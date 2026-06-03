@@ -1,5 +1,13 @@
 <template>
-	<view :class="['default-state', 'w-full', 'box-border', fullPage ? 'default-state--page' : '']">
+	<view
+		:class="[
+			'default-state',
+			'w-full',
+			'box-border',
+			fullPage ? 'default-state--page' : '',
+			normalizedType === 'noAddress' ? 'default-state--address' : ''
+		]"
+	>
 		<view class="default-state__body flex-col col-center text-center">
 			<image
 				class="default-state__image w-full max-w-full"
@@ -7,7 +15,7 @@
 				mode="widthFix"
 			/>
 			<text class="block m-t-44 font-size-44 semibold black lh-12">{{ currentTitle }}</text>
-			<text class="block m-t-28 xs muted lh-16">{{ currentDesc }}</text>
+			<text v-if="currentDesc" class="block m-t-28 xs muted lh-16">{{ currentDesc }}</text>
 		</view>
 
 		<button
@@ -65,6 +73,12 @@ const DEFAULT_STATE_MAP = {
 		title: '暂无相关城市',
 		desc: '请重新搜索或切换其他关键词',
 		buttonText: ''
+	},
+	noAddress: {
+		image: '/static/defaultImg/noAddress.png',
+		title: '暂无收货地址',
+		desc: '',
+		buttonText: '新增地址'
 	}
 }
 
@@ -81,7 +95,8 @@ const DEFAULT_STATE_ALIAS_MAP = {
 	noNews: 'noMessage',
 	message: 'noMessage',
 	coupon: 'noCoupons',
-	city: 'noCity'
+	city: 'noCity',
+	address: 'noAddress'
 }
 
 export default {
@@ -166,5 +181,30 @@ export default {
 .default-state__button {
 	margin-top: 88rpx;
 	border-radius: 999rpx;
+}
+
+.default-state--address {
+	min-height: 100%;
+	padding: 146rpx 0 24rpx;
+	display: flex;
+	flex-direction: column;
+}
+
+.default-state--address .default-state__body {
+	flex: 1;
+	justify-content: center;
+}
+
+.default-state--address .default-state__image {
+	width: 544rpx;
+}
+
+.default-state--address .default-state__button {
+	height: 94rpx;
+	line-height: 94rpx;
+	margin-top: 48rpx;
+	font-size: 34rpx;
+	font-weight: 500;
+	background: #243f95;
 }
 </style>

@@ -84,14 +84,14 @@
 							<view class="section-mark"></view>
 							<text class="section-title">精彩活动</text>
 						</view>
-						<text class="section-action" @tap="openSurpriseActivityMore">了解更多</text>
+						<text class="section-action" @tap="openActivityMore">了解更多</text>
 					</view>
 
 					<view
 						v-for="item in activities"
 						:key="item.id"
 						class="activity-item"
-						@tap="showNotice(item.title)"
+						@tap="openActivityDetail(item)"
 					>
 						<view :class="['activity-thumb', item.thumbTheme]">
 							<view v-if="item.thumbTheme === 'theme-sky'" class="thumb-moon"></view>
@@ -158,7 +158,7 @@
 						<view class="section-mark"></view>
 						<text class="section-title">明星商品</text>
 					</view>
-					<text class="section-action" @tap="showNotice('查看更多明星商品')">查看更多</text>
+					<text class="section-action" @tap="openStrictGoodsMore">查看更多</text>
 				</view>
 
 				<view class="selected-feature-list">
@@ -185,7 +185,13 @@
 						<image class="selected-feature-card__image" :src="item.image" mode="aspectFill"></image>
 					</view>
 				</view>
-
+				<view class="section-head section-head--selected">
+					<view class="section-head-left">
+						<view class="section-mark"></view>
+						<text class="section-title">严选商品</text>
+					</view>
+					<text class="section-action" @tap="openStrictGoodsMore">查看更多</text>
+				</view>
 				<scroll-view class="selected-category-scroll" scroll-x show-scrollbar="false">
 					<view class="selected-category-list">
 						<view
@@ -229,6 +235,7 @@ import {
 	DEFAULT_CAMPUS,
 	formatCampusLocation
 } from '@/config/campus'
+import { getSurpriseActivityList } from '@/bundle_surprise/pages/activity_detail/activity.data'
 
 const getStatusBarHeight = () => {
 	try {
@@ -388,32 +395,7 @@ export default {
 				subtitle: '让生活的小确幸，',
 				subtitleSecond: '在平凡日常里悄悄发光。'
 			},
-			activities: [
-				{
-					id: 1,
-					title: '制“燥”惊喜 | 积分福利月月抽',
-					date: '4月13日 星期一',
-					signupText: '145人报名',
-					status: '报名中',
-					thumbTheme: 'theme-sky'
-				},
-				{
-					id: 2,
-					title: '春日特辑 | 承包您和朋友们的下午茶',
-					date: '4月13日 星期一',
-					signupText: '145人报名',
-					status: '报名中',
-					thumbTheme: 'theme-flower'
-				},
-				{
-					id: 3,
-					title: '福利合伙人 | 马选齿科儿童口腔游园会',
-					date: '4月13日 星期一',
-					signupText: '145人报名',
-					status: '报名中',
-					thumbTheme: 'theme-window'
-				}
-			],
+			activities: getSurpriseActivityList(),
 			communityPosts: [
 				{
 					id: 1,
@@ -515,9 +497,23 @@ export default {
 		setActiveTopTab(index) {
 			this.activeTopTab = index
 		},
-		openSurpriseActivityMore() {
+		openActivityMore() {
 			uni.navigateTo({
-				url: `/bundle_surprise/pages/activity_more/activity_more?categoryId=${this.selectedCategoryId}`
+				url: '/bundle_surprise/pages/activity_more/activity_more'
+			})
+		},
+		openActivityDetail(item) {
+			if (!item || !item.id) {
+				return
+			}
+
+			uni.navigateTo({
+				url: `/bundle_surprise/pages/activity_detail/activity_detail?id=${item.id}`
+			})
+		},
+		openStrictGoodsMore() {
+			uni.navigateTo({
+				url: `/bundle_surprise/pages/goods_more/goods_more?categoryId=${this.selectedCategoryId}`
 			})
 		},
 		openCampusSelector() {

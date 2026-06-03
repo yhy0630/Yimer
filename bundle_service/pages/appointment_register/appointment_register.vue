@@ -495,9 +495,8 @@ export default {
 			})
 		},
 		confirmAppointment() {
-			uni.showToast({
-				title: '挂号信息已确认',
-				icon: 'none'
+			uni.navigateTo({
+				url: `/bundle_service/pages/appointment_success/appointment_success?guideUrl=${encodeURIComponent('/bundle/pages/intelligent_guide/intelligent_guide')}`
 			})
 		}
 	}
