@@ -1,53 +1,73 @@
 <template>
-	<view class="friend-page" :style="{ paddingTop: topInset + 'px' }">
-		<view class="page-shell friend-page__shell">
-			<view class="friend-page__topbar">
-				<view class="friend-page__tabs">
-					<text
-						v-for="tab in tabs"
-						:key="tab.key"
-						:class="['friend-page__tab', activeTab === tab.key ? 'is-active' : '']"
-						@tap="activeTab = tab.key"
-					>
-						{{ tab.label }}
+	<view class="friend-page">
+		<view class="friend-nav" :style="{ paddingTop: statusBarHeight + 'px' }">
+			<view class="page-shell friend-nav__inner">
+				<view class="friend-topbar flex row-between">
+					<view class="friend-tabs flex">
+						<view
+							v-for="tab in tabs"
+							:key="tab.key"
+							:class="['friend-tab', activeTab === tab.key ? 'is-active' : '']"
+							@tap="switchTab(tab.key)"
+						>
+							{{ tab.label }}
+							<image
+								v-if="activeTab === tab.key"
+								src="/static/images/active.png"
+								class="tab_active"
+							/>
+						</view>
+					</view>
+
+					<text v-if="activeTab === 'conversation'" class="friend-page__clear" @tap="handleClearUnread">
+						清除未读
 					</text>
 				</view>
-
-				<text v-if="activeTab === 'conversation'" class="friend-page__clear" @tap="handleClearUnread">
-					清除未读
-				</text>
 			</view>
+		</view>
 
+		<view class="page-shell friend-page__shell">
 			<view v-if="activeTab === 'group'" class="friend-community">
 				<view class="friend-community__head" @tap="goCommunityDiscover">
 					<text class="friend-community__head-title">发现社群</text>
 					<u-icon name="arrow-right" size="30" color="#77797E"></u-icon>
 				</view>
 
-				<swiper
-					class="friend-community__banner-swiper"
-					indicator-dots
-					autoplay
-					circular
-					interval="3500"
-					duration="500"
-					indicator-active-color="rgba(255,255,255,0.95)"
-					indicator-color="rgba(255,255,255,0.34)"
-				>
-					<swiper-item
-						v-for="(banner, bannerIndex) in communityBannerList"
-						:key="`banner-${bannerIndex}`"
+				<view class="friend-community__banner-wrap">
+					<swiper
+						class="friend-community__banner-swiper"
+						:current="bannerCurrent"
+						autoplay
+						circular
+						interval="3500"
+						duration="500"
+						@change="handleBannerChange"
 					>
-						<view class="friend-community__banner-card">
-							<image class="friend-community__banner-image" :src="banner.image" mode="aspectFill" />
-							<view class="friend-community__banner-mask"></view>
-							<view class="friend-community__banner-content">
-								<text class="friend-community__banner-title">{{ banner.title }}</text>
-								<text class="friend-community__banner-desc">{{ banner.desc }}</text>
+						<swiper-item
+							v-for="(banner, bannerIndex) in communityBannerList"
+							:key="`banner-${bannerIndex}`"
+						>
+							<view class="friend-community__banner-card">
+								<image class="friend-community__banner-image" :src="banner.image" mode="aspectFill" />
+								<view class="friend-community__banner-mask"></view>
+								<view class="friend-community__banner-content">
+									<text class="friend-community__banner-title">{{ banner.title }}</text>
+									<text class="friend-community__banner-desc">{{ banner.desc }}</text>
+								</view>
 							</view>
-						</view>
-					</swiper-item>
-				</swiper>
+						</swiper-item>
+					</swiper>
+					<view class="friend-community__banner-dots">
+						<view
+							v-for="(banner, bannerIndex) in communityBannerList"
+							:key="`banner-dot-${bannerIndex}`"
+							:class="[
+								'friend-community__banner-dot',
+								bannerCurrent === bannerIndex ? 'is-active' : ''
+							]"
+						/>
+					</view>
+				</view>
 
 				<view class="friend-community__list">
 					<view
@@ -83,6 +103,57 @@
 							</view>
 						</view>
 						<view class="friend-community__action">查看</view>
+					</view>
+				</view>
+			</view>
+
+			<view v-else-if="activeTab === 'contacts'" class="friend-contacts">
+				<view class="community-page__search">
+					<u-icon name="search" size="32" color="#FFFFFF"></u-icon>
+					<view class="community-page__search-divider"></view>
+					<text class="community-page__search-text">请搜索</text>
+				</view>
+
+				<view
+					v-for="section in contactSections"
+					:key="section.key"
+					class="friend-contacts__section"
+				>
+					<view class="friend-contacts__section-head" @tap="toggleContactSection(section.key)">
+						<text class="friend-contacts__section-title">{{ section.title }}</text>
+						<u-icon
+							:name="section.expanded ? 'arrow-up' : 'arrow-down'"
+							size="24"
+							color="#8F949F"
+						></u-icon>
+					</view>
+
+					<view v-if="section.expanded" class="friend-contacts__section-body">
+						<view
+							v-for="(item, itemIndex) in section.items"
+							:key="item.id"
+							class="friend-contacts__item"
+							@tap="handleContactTap(item)"
+						>
+							<image class="friend-contacts__avatar" :src="item.avatar" mode="aspectFill" />
+							<view
+								:class="[
+									'friend-contacts__item-main',
+									itemIndex < section.items.length - 1 ? 'has-divider' : ''
+								]"
+							>
+								<view class="friend-contacts__item-row">
+									<text class="friend-contacts__name">{{ item.name }}</text>
+									<view
+										v-if="item.showUnfollow"
+										class="friend-contacts__unfollow"
+										@tap.stop="handleUnfollow(item)"
+									>
+										取关
+									</view>
+								</view>
+							</view>
+						</view>
 					</view>
 				</view>
 			</view>
@@ -183,12 +254,12 @@
 </template>
 
 <script>
-const getTopInset = () => {
+const getStatusBarHeight = () => {
 	try {
 		const { statusBarHeight = 20 } = uni.getSystemInfoSync()
-		return statusBarHeight + 14
+		return statusBarHeight
 	} catch (error) {
-		return 34
+		return 20
 	}
 }
 
@@ -196,6 +267,43 @@ const TABS = [
 	{ key: 'conversation', label: '会话' },
 	{ key: 'group', label: '社群' },
 	{ key: 'contacts', label: '通讯录' }
+]
+
+const CONTACT_SECTIONS = [
+	{
+		key: 'doctors',
+		title: '我的医生',
+		expanded: true,
+		items: [
+			{ id: 'doctor-1', name: '周进医生', avatar: '/static/linshi/01.png' },
+			{ id: 'doctor-2', name: '胡嘉言医生', avatar: '/static/linshi/02.png' }
+		]
+	},
+	{
+		key: 'consultants',
+		title: '我的顾问',
+		expanded: true,
+		items: [{ id: 'consultant-1', name: '冯艺莲', avatar: '/static/linshi/01.png' }]
+	},
+	{
+		key: 'managers',
+		title: '我的客管',
+		expanded: true,
+		items: [{ id: 'manager-1', name: '吴彦琛', avatar: '/static/linshi/02.png' }]
+	},
+	{
+		key: 'besties',
+		title: '我的闺蜜',
+		expanded: true,
+		items: [
+			{
+				id: 'bestie-1',
+				name: '赵萸艳',
+				avatar: '/static/linshi/01.png',
+				showUnfollow: true
+			}
+		]
+	}
 ]
 
 const COMMUNITY_ICONS = [
@@ -483,12 +591,14 @@ const createPanels = () => ({
 export default {
 	data() {
 		return {
-			topInset: getTopInset(),
+			statusBarHeight: getStatusBarHeight(),
 			tabs: TABS,
 			activeTab: 'conversation',
 			panels: createPanels(),
 			communityBannerList: COMMUNITY_BANNERS,
-			communityList: COMMUNITY_LIST
+			communityList: COMMUNITY_LIST,
+			bannerCurrent: 0,
+			contactSections: JSON.parse(JSON.stringify(CONTACT_SECTIONS))
 		}
 	},
 	computed: {
@@ -497,6 +607,9 @@ export default {
 		}
 	},
 	methods: {
+		switchTab(tabKey) {
+			this.activeTab = tabKey
+		},
 		handleClearUnread() {
 			this.activeSections.forEach((section) => {
 				section.items.forEach((item) => {
@@ -511,17 +624,56 @@ export default {
 			})
 		},
 		handleConversationTap(item) {
-			uni.showToast({
-				title: item.title,
-				icon: 'none'
-			})
+			if (!item || item.avatarType === 'system') {
+				uni.showToast({
+					title: item ? item.title : '',
+					icon: 'none'
+				})
+				return
+			}
+
+			const isGroup = item.avatarType === 'group'
+			const type = isGroup ? 'group' : 'personal'
+			const title = encodeURIComponent(
+				isGroup && item.id === 'vip-group' ? '专属服务群' : item.title
+			)
+			let url = `/bundle_friend/pages/chat/chat?type=${type}&title=${title}`
+
+			if (isGroup) {
+				url += '&count=4'
+			} else if (item.id === 'wuyanqian' || item.showHot) {
+				url = `/bundle_friend/pages/chat/chat?type=personal&title=${encodeURIComponent('伊美尔用户00QX95')}&burnDays=430`
+			}
+
+			uni.navigateTo({ url })
 		},
 		getCommunityIcon(index) {
 			return COMMUNITY_ICONS[index % COMMUNITY_ICONS.length]
 		},
+		handleBannerChange(event) {
+			this.bannerCurrent = event.detail.current || 0
+		},
 		goCommunityDiscover() {
 			uni.navigateTo({
 				url: '/bundle_friend/pages/community/community'
+			})
+		},
+		toggleContactSection(sectionKey) {
+			const section = this.contactSections.find((item) => item.key === sectionKey)
+			if (section) {
+				section.expanded = !section.expanded
+			}
+		},
+		handleContactTap(item) {
+			uni.showToast({
+				title: item.name,
+				icon: 'none'
+			})
+		},
+		handleUnfollow(item) {
+			uni.showToast({
+				title: `已取关${item.name}`,
+				icon: 'none'
 			})
 		}
 	}
@@ -536,48 +688,53 @@ export default {
 		linear-gradient(180deg, #fefefe 0%, #ffffff 320rpx, #ffffff 100%);
 }
 
-.friend-page__shell {
-	padding-bottom: calc(env(safe-area-inset-bottom) + 180rpx);
+.friend-nav {
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	background: linear-gradient(180deg, rgba(244, 247, 255, 1) 0%, rgba(244, 247, 255, 1) 100%);
+	backdrop-filter: blur(16rpx);
 }
 
-.friend-page__topbar {
-	display: flex;
+.friend-nav__inner {
+	padding-bottom: 12rpx;
+}
+
+.friend-topbar {
+	height: 88rpx;
 	align-items: center;
-	justify-content: space-between;
-	padding-top: 14rpx;
 }
 
-.friend-page__tabs {
-	display: flex;
+.friend-tabs {
 	align-items: center;
 	min-width: 0;
 }
 
-.friend-page__tab {
+.friend-tab {
 	position: relative;
-	padding: 12rpx 0 14rpx;
-	margin-right: 44rpx;
-	font-size: 32rpx;
-	font-weight: 600;
-	color: #2e3138;
-	z-index: 0;
+	margin-right: 36rpx;
+	padding-bottom: 14rpx;
+	font-size: 28rpx;
+	color: #323437;
+
+	.tab_active {
+		position: absolute;
+		z-index: -1;
+		left: 14rpx;
+		top: 3rpx;
+		width: 28rpx;
+		height: 34rpx;
+	}
 }
 
-.friend-page__tab.is-active {
+.friend-tab.is-active {
 	color: #143080;
+	font-weight: 700;
 }
 
-.friend-page__tab.is-active::before {
-	content: '';
-	position: absolute;
-	left: 22rpx;
-	bottom: 8rpx;
-	width: 18rpx;
-	height: 44rpx;
-	border-radius: 999rpx;
-	background: linear-gradient(180deg, #f7cb60 0%, #d89e2b 100%);
-	transform: rotate(28deg);
-	z-index: -1;
+.friend-page__shell {
+	// padding-top: 12rpx;
+	padding-bottom: calc(env(safe-area-inset-bottom) + 180rpx);
 }
 
 .friend-page__clear {
@@ -815,34 +972,48 @@ export default {
 }
 
 .friend-community__head-title {
-	font-size: 38rpx;
-	font-weight: 700;
-	color: #151924;
+	font-size: 34rpx;
+	font-weight: 500;
+	color: #1A1B1D;
+	line-height: 24rpx;
+	font-style: normal;
+	text-align: center;
+}
+
+.friend-community__banner-wrap {
+	position: relative;
+	width: 100%;
+	height: 330rpx;
+	margin-top: 40rpx;
 }
 
 .friend-community__banner-swiper {
 	width: 100%;
-	height: 333rpx;
-	margin-top: 38rpx;
+	height: 100%;
 }
 
-.friend-community__banner-swiper :deep(.uni-swiper-dots) {
+.friend-community__banner-dots {
+	position: absolute;
+	left: 0;
+	right: 0;
 	bottom: 16rpx;
+	z-index: 2;
 	display: flex;
 	align-items: center;
+	justify-content: center;
+	pointer-events: none;
 }
 
-.friend-community__banner-swiper :deep(.uni-swiper-dot) {
-	width: 14rpx;
-	height: 8rpx;
+.friend-community__banner-dot {
+	width: 20rpx;
+	height: 4rpx;
 	margin: 0 4rpx;
 	border-radius: 999rpx;
+	background: rgba(255, 255, 255, 0.34);
 }
 
-.friend-community__banner-swiper :deep(.uni-swiper-dot-active) {
-	width: 24rpx;
-	height: 8rpx;
-	border-radius: 999rpx;
+.friend-community__banner-dot.is-active {
+	background: rgba(255, 255, 255, 0.95);
 }
 
 .friend-community__banner-card {
@@ -866,37 +1037,43 @@ export default {
 .friend-community__banner-content {
 	position: absolute;
 	left: 40rpx;
-	bottom: 43rpx;
+	bottom: 34rpx;
 	display: flex;
 	flex-direction: column;
 }
 
 .friend-community__banner-title {
-	font-size: 39rpx;
+	font-size: 34rpx;
 	font-weight: 500;
-	line-height: 1.15;
+	font-style: normal;
+	line-height: 48rpx;
 	color: #ffffff;
+	// text-align: center;
 }
 
 .friend-community__banner-desc {
-	margin-top: 15rpx;
-	font-size: 26rpx;
-	color: rgba(255, 255, 255, 0.92);
+	margin-top: 10rpx;
+	font-size: 24rpx;
+	color: #FFF;
+	font-weight: 400;
+	line-height: 32rpx;
+	font-style: normal;
+	// text-align: center;
 }
 
 .friend-community__list {
-	margin-top: 16rpx;
+	margin-top: 20rpx;
 }
 
 .friend-community__item {
 	display: flex;
 	align-items: stretch;
-	padding: 22rpx 0;
+	padding: 20rpx 0;
 }
 
 .friend-community__cover-wrap {
-	width: 150rpx;
-	height: 150rpx;
+	width: 144rpx;
+	height: 144rpx;
 	flex: none;
 	align-self: center;
 	border-radius: 14rpx;
@@ -913,8 +1090,7 @@ export default {
 .friend-community__body {
 	flex: 1;
 	min-width: 0;
-	margin-left: 20rpx;
-	padding-top: 2rpx;
+	margin-left: 30rpx;
 }
 
 .friend-community__meta {
@@ -923,29 +1099,32 @@ export default {
 }
 
 .friend-community__meta-chip {
-	height: 40rpx;
-	padding: 0 14rpx;
-	margin-right: 10rpx;
-	border-radius: 10rpx;
+	height: 36rpx;
+	padding: 2rpx 4rpx;
+	margin-right: 14rpx;
+	border-radius: 4rpx;
 	background: #f7f7f7;
 	font-size: 22rpx;
-	line-height: 40rpx;
+	line-height: 28rpx;
 	color: #77797e;
+	font-weight: 400;
+	font-style: normal;
 }
 
 .friend-community__name {
 	display: block;
-	margin-top: 20rpx;
-	font-size: 32rpx;
+	margin-top: 16rpx;
+	font-size: 28rpx;
 	font-weight: 600;
-	line-height: 1.2;
-	color: #171a21;
+	line-height: 40rpx;
+	color: #1a1b1d;
+	font-style: normal;
 }
 
 .friend-community__footer {
 	display: flex;
 	align-items: center;
-	margin-top: 20rpx;
+	margin-top: 16rpx;
 }
 
 .friend-community__members {
@@ -955,33 +1134,146 @@ export default {
 }
 
 .friend-community__member-avatar {
-	width: 26rpx;
-	height: 26rpx;
-	margin-right: -6rpx;
+	width: 24rpx;
+	height: 24rpx;
+	margin-right: 0;
 	border-radius: 50%;
-	border: 2rpx solid #ffffff;
-	background: #edf0f8;
+	border: 1rpx solid #ffffff;
 }
 
 .friend-community__member-count {
-	margin-left: 20rpx;
-	font-size: 22rpx;
-	color: #77797E;
+	margin-left: 16rpx;
+	font-size: 20rpx;
+	color: #77797e;
+	font-weight: 400;
+	line-height: 28rpx;
+	font-style: normal;
 }
 
 .friend-community__action {
 	display: block;
-	width: 94rpx;
-	height: 48rpx;
-	line-height: 44rpx;
+	width: 104rpx;
+	height: 44rpx;
+	line-height: 36rpx;
 	text-align: center;
 	align-self: center;
 	flex: none;
 	margin-left: 18rpx;
-	border-radius: 23rpx;
-	border: 2rpx solid #E1E2E5;
-	background: #ffffff;
+	border-radius: 22rpx;
+	border: 1rpx solid #e1e2e5;
 	font-size: 24rpx;
-	color: #77797E;
+	color: #77797e;
+	font-style: normal;
+	font-weight: 400;
+}
+
+.community-page__search {
+	display: flex;
+	align-items: center;
+	height: 70rpx;
+	padding: 0 20rpx;
+	margin-top: 30rpx;
+	border-radius: 12rpx;
+	background: #f1f1f2;
+}
+
+.community-page__search-text {
+	margin-left: 20rpx;
+	font-size: 24rpx;
+	color: #b8b8b8;
+	text-align: center;
+	line-height: 32rpx;
+	font-style: normal;
+	font-weight: 400;
+}
+
+.community-page__search-divider {
+	width: 2rpx;
+	height: 26rpx;
+	margin-left: 20rpx;
+	background: #d3d3d3;
+}
+
+.friend-contacts .community-page__search {
+	margin-top: 0;
+}
+
+.friend-contacts__section {
+	margin-top: 28rpx;
+}
+
+.friend-contacts__section-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 8rpx 0;
+}
+
+.friend-contacts__section-title {
+	font-size: 28rpx;
+	color: #8f949f;
+	line-height: 1.2;
+}
+
+.friend-contacts__section-body {
+	margin-top: 8rpx;
+	background: #ffffff;
+	border-radius: 12rpx;
+}
+
+.friend-contacts__item {
+	display: flex;
+	align-items: stretch;
+	padding-left: 0;
+}
+
+.friend-contacts__avatar {
+	width: 72rpx;
+	height: 72rpx;
+	margin: 24rpx 20rpx 24rpx 0;
+	border-radius: 50%;
+	flex: none;
+	background: #eef2f8;
+}
+
+.friend-contacts__item-main {
+	flex: 1;
+	min-width: 0;
+	padding: 24rpx 0;
+}
+
+.friend-contacts__item-main.has-divider {
+	border-bottom: 1rpx solid rgba(17, 24, 39, 0.06);
+}
+
+.friend-contacts__item-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	min-height: 72rpx;
+	padding-right: 0;
+}
+
+.friend-contacts__name {
+	flex: 1;
+	min-width: 0;
+	font-size: 32rpx;
+	font-weight: 500;
+	color: #1a1b1d;
+	line-height: 1.2;
+}
+
+.friend-contacts__unfollow {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 104rpx;
+	height: 44rpx;
+	margin-left: 18rpx;
+	border: 1rpx solid #e1e2e5;
+	border-radius: 22rpx;
+	font-size: 24rpx;
+	color: #77797e;
+	flex: none;
 }
 </style>

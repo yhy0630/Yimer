@@ -402,6 +402,59 @@
 				"style": {
 					"navigationStyle": "custom"
 				}
+			},
+			{
+				"path": "pages/chat/chat",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/chat_setting/chat_setting",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			}
+		]
+	},
+	{
+		"root": "bundle_coffee",
+		"pages": [
+			{
+				"path": "pages/index/index",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/order_list/order_list",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/menu/menu",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/checkout/checkout",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/payment/payment",
+				"style": {
+					"navigationStyle": "custom"
+				}
+			},
+			{
+				"path": "pages/order_detail/order_detail",
+				"style": {
+					"navigationStyle": "custom"
+				}
 			}
 		]
 	}],

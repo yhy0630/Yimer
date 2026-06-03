@@ -269,6 +269,10 @@
 		活动报名: {
 			type: 'navigateTo',
 			url: '/bundle_surprise/pages/activity_more/activity_more'
+		},
+		蓝猫咖啡: {
+			type: 'navigateTo',
+			url: '/bundle_coffee/pages/index/index'
 		}
 	}
 
